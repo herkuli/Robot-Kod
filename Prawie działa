@@ -1,0 +1,107 @@
+//servo
+#include <Adafruit_TiCoServo.h>
+#define SERVO_PIN    10
+#define SERVO_MIN 1000 // 1 ms pulse
+#define SERVO_MAX 2000 // 2 ms pulse
+//sensor
+#define sensor1 A0
+//LED
+#include <Adafruit_NeoPixel.h>
+#define LED_PIN 6
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, LED_PIN);
+
+Adafruit_TiCoServo ramie;
+Adafruit_TiCoServo lokiec;
+Adafruit_TiCoServo dlon;
+int posramie = 0;
+int poslokiec = 0;
+int posdlon = 0;
+float v1 = 2;
+float v2 = 0.5;
+float v3 = 0.1;
+
+
+
+
+void setup() {
+#if defined (__AVR_ATtiny85__)
+  if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+#endif
+
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+
+  ramie.attach(10);
+  lokiec.attach(6);
+  dlon.attach(0);
+  ramie.write(0);
+  lokiec.write(0);
+  dlon.write(0);
+
+  pinMode(sensor1, INPUT);
+  Serial.begin(9600);
+
+}
+
+void loop() {
+  //sensor
+  int odczyt = analogRead(sensor1);
+  Serial.println(odczyt);
+  if (odczyt >= 500)          //jeżeli wykryto ciemny kolor
+  {
+    diodaOFF();
+  }
+  else {
+    diodaON();
+    p1();
+
+  }
+}
+
+void p1() {
+  ramie.write(posramie);
+  posramie = posramie + v1;
+  lokiec.write(poslokiec);
+  poslokiec = poslokiec + v2;
+  dlon.write(posdlon);
+  posdlon = posdlon + v3;
+  delay(20);
+  if (posramie > 180) {
+    delay(200);
+    v1 = -v1;
+  }
+  if (poslokiec > 90) {
+    delay(200);
+    v2 = -v2;
+  }
+  if (posdlon > 50) {
+    delay(200);
+    v3 = -v3;
+  }
+  if (posramie < 0) {
+    delay(200);
+    v1 = -v1;
+  }
+  if (poslokiec < 0) {
+    delay(200);
+    v2 = -v2;
+  }
+  if (posdlon < 0) {
+    delay(200);
+    v3 = -v3;
+  }
+}
+
+
+void diodaON() {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(0, 30, 0));
+    strip.show();
+  }
+}
+void diodaOFF() {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(0, 0, 0));
+    strip.show();
+  }
+}
