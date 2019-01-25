@@ -1,0 +1,48 @@
+
+int posramie = 0;
+int poslokiec = 0;
+float v1 = 1;
+float v2 = 1;
+
+#include <Servo.h>
+
+Servo ramie;
+Servo lokiec;
+
+
+void setup() {
+  ramie.attach(10);
+  lokiec.attach(9);
+  ramie.write(0);
+  lokiec.write(0);
+  v1 = 1;
+  v2 = 2;
+}
+
+void loop() {
+  
+  p1();
+}
+void p1() {
+  ramie.write(posramie);
+  posramie = posramie + v1;
+  lokiec.write(poslokiec);
+  poslokiec = poslokiec + v2;
+  delay(10);
+  if (posramie > 180) {
+    delay(200);
+    v1 = -v1;
+  }
+  if (poslokiec > 90) {
+    delay(200);
+    v2 = -v2;
+  }
+  if (posramie < 0) {
+    delay(200);
+    v1 = -v1;
+  }
+  if (poslokiec < 0) {
+    delay(200);
+    v2 = -v2;
+  }
+}
