@@ -1,0 +1,199 @@
+//servo
+#include <Adafruit_TiCoServo.h>
+#define SERVO_PIN    10
+#define SERVO_MIN 1000 // 1 ms pulse
+#define SERVO_MAX 2000 // 2 ms pulse
+//sensor
+#define sensor1 A0
+#define sensor2 A1
+//LED
+#include <Adafruit_NeoPixel.h>
+#define LED_PIN 8
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, LED_PIN);
+
+Adafruit_TiCoServo ramie;
+Adafruit_TiCoServo lokiec;
+int posramie = 0;
+int poslokiec = 0;
+float v1 = 3;
+float v2 = 3;
+float pd = 25;
+float pg = 85;
+
+
+
+
+void setup() {
+#if defined (__AVR_ATtiny85__)
+  if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+#endif
+
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+
+  ramie.attach(9);
+  lokiec.attach(10);
+  ramie.write(90);
+  lokiec.write(25);
+
+  pinMode(sensor1, INPUT);
+  pinMode(sensor2, INPUT);
+  Serial.begin(9600);
+
+
+}
+
+void loop() {
+  //sensor
+  int odczyt1 = analogRead(sensor1);
+  int odczyt2 = analogRead(sensor2);
+  Serial.println(odczyt1);
+    Serial.println(odczyt2);
+  if (odczyt1 >= 500 && odczyt2 >= 500)          //jeżeli wykryto ciemny kolor
+  {
+    diodaOFF();
+    diodaOFF2();
+    straszak();
+
+  }
+  else {
+    diodaON();
+    delay(800);
+    p1();
+    p2();
+    p3();
+    p4();
+    p5();
+    diodaON2();
+    delay(5000);
+  }
+}
+
+void p1() {
+  for (posramie = 90; posramie <= 155; posramie += v1) { // goes from 0 degrees to 180 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 155; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p2() {
+  for (posramie = 90; posramie <= 120; posramie += v1) { // goes from 0 degrees to 180 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg + 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg + 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 120; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p3() {
+  ramie.write(90);
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p4() {
+  for (posramie = 90; posramie >= 60; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 60; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p5() {
+  for (posramie = 90; posramie >= 10; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg - 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg - 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 10; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+
+void straszak() {
+  lokiec.write(random(25, 60));
+  ramie.write(random(60, 110));
+  delay(100);
+}
+
+
+
+void diodaON() {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(0, 30, 0));
+    strip.show();
+    delay(100);
+  }
+}
+
+void diodaON2() {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(30, 0, 0));
+    strip.show();
+    delay(100);
+  }
+}
+
+
+void diodaOFF() {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(70, 30, 0));
+    strip.show();
+    delay(50);
+  }
+}
+void diodaOFF2() {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(0, 0, 0));
+    strip.show();
+    delay(50);
+  }
+}
