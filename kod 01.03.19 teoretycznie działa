@@ -1,0 +1,426 @@
+//servo
+#include <Adafruit_TiCoServo.h>
+#define SERVO_PIN    10
+#define SERVO_MIN 1000 // 1 ms pulse
+#define SERVO_MAX 2000 // 2 ms pulse
+//sensor łączenia
+#define sensor1 A1 //kciuk
+#define sensor2 A2 //wskazujący
+#define sensor3 A3 //środkowy
+#define sensor4 A4 //serdeczny
+#define sensor5 A5 //mały
+//LEDy
+#include <Adafruit_NeoPixel.h>
+#define led1 1//kciuk
+#define led2 2
+#define led3 3
+#define led4 4 
+#define led5 5
+
+Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(1, led1);
+Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(1, led1);
+Adafruit_NeoPixel strip3 = Adafruit_NeoPixel(1, led1);
+Adafruit_NeoPixel strip4 = Adafruit_NeoPixel(1, led1);
+Adafruit_NeoPixel strip5 = Adafruit_NeoPixel(1, led1);
+
+Adafruit_TiCoServo ramie;
+Adafruit_TiCoServo lokiec;
+int posramie = 0;
+int poslokiec = 0;
+float v1 = 3; //prędkość ramię
+float v2 = 3; //prędkość łokieć
+float pd = 25; //pozycja dolna
+float pg = 85; //pozycja górna
+
+
+
+
+void setup() {
+#if defined (__AVR_ATtiny85__)
+  if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+#endif
+  //załączenie kolejnych LEDów
+  strip1.begin();
+  strip1.show();
+
+  strip2.begin();
+  strip2.show();
+
+  strip3.begin();
+  strip3.show();
+
+  strip4.begin();
+  strip4.show();
+
+  strip5.begin();
+  strip5.show();
+  //podłączenie servo
+  ramie.attach(9);
+  lokiec.attach(10);
+  ramie.write(90);
+  lokiec.write(25);
+  //podłączenie sensorów
+  pinMode(sensor1, INPUT);
+  pinMode(sensor2, INPUT);
+  pinMode(sensor3, INPUT);
+  pinMode(sensor4, INPUT);
+  pinMode(sensor5, INPUT);
+  Serial.begin(9600);
+
+
+}
+
+void loop() {
+  //odczyt sensorów
+  int odczyt1 = analogRead(sensor1);
+  int odczyt2 = analogRead(sensor2);
+  int odczyt3 = analogRead(sensor3);
+  int odczyt4 = analogRead(sensor4);
+  int odczyt5 = analogRead(sensor5);
+  Serial.println(odczyt1);
+  Serial.println(odczyt2);
+  Serial.println(odczyt3);
+  Serial.println(odczyt4);
+  Serial.println(odczyt5);
+
+  //sensor włącza światełko 1
+  if (odczyt1 >= 500)          //jeżeli wykryto jasny kolor sensor włącza czerwone światło
+  {
+    dioda1OFF();
+    dioda1OFF2();
+  }
+  else { //jeżeli wykryto ciemny kolor sensor włącza zielone światło
+    dioda1ON();
+    delay(800);
+    dioda1ON2();
+    delay(5000);
+  }
+
+  //sensor włącza światełko 2
+  if (odczyt2 >= 500)          //jeżeli wykryto jasny kolor sensor włącza czerwone światło
+  {
+    dioda2OFF();
+    dioda2OFF2();
+  }
+  else { //jeżeli wykryto ciemny kolor sensor włącza zielone światło
+    dioda2ON();
+    delay(800);
+    dioda2ON2();
+    delay(5000);
+  }
+  //sensor włącza światełko 3
+  if (odczyt3 >= 500)          //jeżeli wykryto jasny kolor sensor włącza czerwone światło
+  {
+    dioda3OFF();
+    dioda3OFF2();
+  }
+  else { //jeżeli wykryto ciemny kolor sensor włącza zielone światło
+    dioda3ON();
+    delay(800);
+    dioda3ON2();
+    delay(5000);
+  }
+  //sensor włącza światełko 4
+  if (odczyt4 >= 500)          //jeżeli wykryto jasny kolor sensor włącza czerwone światło
+  {
+    dioda4OFF();
+    dioda4OFF2();
+  }
+  else { //jeżeli wykryto ciemny kolor sensor włącza zielone światło
+    dioda4ON();
+    delay(800);
+    dioda4ON2();
+    delay(5000);
+  }
+  //sensor włącza światełko 5
+  if (odczyt5 >= 500)          //jeżeli wykryto jasny kolor sensor włącza czerwone światło
+  {
+    dioda5OFF();
+    dioda5OFF2();
+  }
+  else { //jeżeli wykryto ciemny kolor sensor włącza zielone światło
+    dioda5ON();
+    delay(800);
+    dioda5ON2();
+    delay(5000);
+  }
+  //jeśli wszystko działa program włącza się, jeśli nie, świruje
+  if (odczyt1 >= 500 && odczyt2 >= 500 && odczyt3 >= 500 && odczyt4 >= 500 && odczyt5 >= 500)       //jeżeli wykryto ciemny kolor
+  {
+    straszak();
+  }
+  else {
+    delay(800);
+    p1();
+    p2();
+    p3();
+    p4();
+    p5();
+    delay(5000);
+  }
+}
+
+void p1() {
+  for (posramie = 90; posramie <= 155; posramie += v1) {
+    ramie.write(posramie);
+    delay(20);
+  }
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) {
+    lokiec.write(poslokiec);
+    delay(20);
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) {
+    lokiec.write(poslokiec);
+    delay(20);
+  }
+  for (posramie = 155; posramie >= 90; posramie -= v1) {
+    ramie.write(posramie);
+    delay(20);
+  }
+}
+void p2() {
+  for (posramie = 90; posramie <= 120; posramie += v1) {
+    ramie.write(posramie);
+    delay(20);
+  }
+  for (poslokiec = pd; poslokiec <= pg + 5; poslokiec += v2) {
+    lokiec.write(poslokiec);
+    delay(20);
+  }
+  for (poslokiec = pg + 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 120; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p3() {
+  ramie.write(90);
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p4() {
+  for (posramie = 90; posramie >= 60; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 60; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p5() {
+  for (posramie = 90; posramie >= 10; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+  for (poslokiec = pd; poslokiec <= pg - 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg - 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    lokiec.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 10; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    ramie.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+
+
+
+void straszak() {
+  lokiec.write(random(25, 60));
+  ramie.write(random(60, 110));
+  delay(100);
+}
+
+//-----------------------dioda palec 1------------------------
+//------------------------------------------------------------
+// dioda kolor zielony
+void dioda1ON() {
+  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
+    strip1.setPixelColor(i, strip1.Color(0, 30, 0));
+    strip1.show();
+    delay(100);
+  }
+}
+//dioda kolor czerwony
+void dioda1ON2() {
+  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
+    strip1.setPixelColor(i, strip1.Color(30, 0, 0));
+    strip1.show();
+    delay(100);
+  }
+}
+
+//dioda kolor pomarańczowy
+void dioda1OFF() {
+  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
+    strip1.setPixelColor(i, strip1.Color(70, 30, 0));
+    strip1.show();
+    delay(50);
+  }
+}
+//dioda wyłączona
+void dioda1OFF2() {
+  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
+    strip1.setPixelColor(i, strip1.Color(0, 0, 0));
+    strip1.show();
+    delay(50);
+  }
+}
+
+//-----------------------dioda palec 2------------------------
+//------------------------------------------------------------
+void dioda2ON() {
+  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
+    strip2.setPixelColor(i, strip2.Color(0, 30, 0));
+    strip2.show();
+    delay(100);
+  }
+}
+
+void dioda2ON2() {
+  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
+    strip2.setPixelColor(i, strip2.Color(30, 0, 0));
+    strip2.show();
+    delay(100);
+  }
+}
+
+
+void dioda2OFF() {
+  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
+    strip2.setPixelColor(i, strip2.Color(70, 30, 0));
+    strip2.show();
+    delay(50);
+  }
+}
+void dioda2OFF2() {
+  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
+    strip2.setPixelColor(i, strip2.Color(0, 0, 0));
+    strip2.show();
+    delay(50);
+  }
+}
+
+//-----------------------dioda palec 3------------------------
+//------------------------------------------------------------
+void dioda3ON() {
+  for (uint16_t i = 0; i < strip3.numPixels(); i++) {
+    strip3.setPixelColor(i, strip3.Color(0, 30, 0));
+    strip3.show();
+    delay(100);
+  }
+}
+
+void dioda3ON2() {
+  for (uint16_t i = 0; i < strip3.numPixels(); i++) {
+    strip3.setPixelColor(i, strip3.Color(30, 0, 0));
+    strip3.show();
+    delay(100);
+  }
+}
+
+
+void dioda3OFF() {
+  for (uint16_t i = 0; i < strip3.numPixels(); i++) {
+    strip3.setPixelColor(i, strip3.Color(70, 30, 0));
+    strip3.show();
+    delay(50);
+  }
+}
+void dioda3OFF2() {
+  for (uint16_t i = 0; i < strip3.numPixels(); i++) {
+    strip3.setPixelColor(i, strip3.Color(0, 0, 0));
+    strip3.show();
+    delay(50);
+  }
+}
+
+//-----------------------DIODA PALEC 4------------------------
+//------------------------------------------------------------
+void dioda4ON() {
+  for (uint16_t i = 0; i < strip4.numPixels(); i++) {
+    strip4.setPixelColor(i, strip4.Color(0, 30, 0));
+    strip4.show();
+    delay(100);
+  }
+}
+
+void dioda4ON2() {
+  for (uint16_t i = 0; i < strip4.numPixels(); i++) {
+    strip4.setPixelColor(i, strip4.Color(30, 0, 0));
+    strip4.show();
+    delay(100);
+  }
+}
+
+
+void dioda4OFF() {
+  for (uint16_t i = 0; i < strip4.numPixels(); i++) {
+    strip4.setPixelColor(i, strip4.Color(70, 30, 0));
+    strip4.show();
+    delay(50);
+  }
+}
+void dioda4OFF2() {
+  for (uint16_t i = 0; i < strip4.numPixels(); i++) {
+    strip4.setPixelColor(i, strip4.Color(0, 0, 0));
+    strip4.show();
+    delay(50);
+  }
+}
+
+//-----------------------dioda palec 5------------------------
+//------------------------------------------------------------
+void dioda5ON() {
+  for (uint16_t i = 0; i < strip5.numPixels(); i++) {
+    strip5.setPixelColor(i, strip5.Color(0, 30, 0));
+    strip5.show();
+    delay(100);
+  }
+}
+
+void dioda5ON2() {
+  for (uint16_t i = 0; i < strip5.numPixels(); i++) {
+    strip5.setPixelColor(i, strip5.Color(30, 0, 0));
+    strip5.show();
+    delay(100);
+  }
+}
+
+
+void dioda5OFF() {
+  for (uint16_t i = 0; i < strip5.numPixels(); i++) {
+    strip5.setPixelColor(i, strip5.Color(70, 30, 0));
+    strip5.show();
+    delay(50);
+  }
+}
+void dioda5OFF2() {
+  for (uint16_t i = 0; i < strip5.numPixels(); i++) {
+    strip5.setPixelColor(i, strip5.Color(0, 0, 0));
+    strip5.show();
+    delay(50);
+  }
+}
