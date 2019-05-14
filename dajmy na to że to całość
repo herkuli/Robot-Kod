@@ -1,0 +1,593 @@
+#include <Adafruit_NeoPixel.h>
+#include <Adafruit_TiCoServo.h>
+
+#define sensor1 A1 //kciuk
+#define sensor2 A2 //wskazujący
+#define sensor3 A3 //środkowy
+#define sensor4 A4 //serdeczny
+#define sensor5 A5 //mały
+
+#define led2 2 //wskazujący
+#define led3 3 //środkowy
+#define led4 4 //serdeczny
+#define led5 5 //mały
+#define led1 6 //kciuk
+
+#define SERVO_PIN    9
+#define SERVO_PIN2    10
+
+Adafruit_TiCoServo servo;
+Adafruit_TiCoServo servo2;
+
+Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(8, led1);
+Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(8, led2);
+Adafruit_NeoPixel strip3 = Adafruit_NeoPixel(8, led3);
+Adafruit_NeoPixel strip4 = Adafruit_NeoPixel(8, led4);
+Adafruit_NeoPixel strip5 = Adafruit_NeoPixel(8, led5);
+
+Adafruit_NeoPixel leds[5] = {strip1, strip2, strip3, strip4, strip5};
+
+boolean nozJestUruchomiony = false;
+
+boolean odczyt1Aktywny = false;
+boolean odczyt2Aktywny = false;
+boolean odczyt3Aktywny = false;
+boolean odczyt4Aktywny = false;
+boolean odczyt5Aktywny = false;
+
+const long interval = 100;
+
+int ktoraDioda1jestAktywna = 0;
+int ktoraDioda2jestAktywna = 0;
+int ktoraDioda3jestAktywna = 0;
+int ktoraDioda4jestAktywna = 0;
+int ktoraDioda5jestAktywna = 0;
+
+
+unsigned long previousDioda1Millis = 0;
+unsigned long previousDioda2Millis = 0;
+unsigned long previousDioda3Millis = 0;
+unsigned long previousDioda4Millis = 0;
+unsigned long previousDioda5Millis = 0;
+
+int posramie = 0;
+int poslokiec = 0;
+float v1 = 3;
+float v2 = 3;
+float pd = 25;
+float pg = 85;
+
+void setup() {
+
+#if defined (__AVR_ATtiny85__)
+  if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+#endif
+  //załączenie kolejnych LEDów
+  strip1.begin();
+  strip1.show();
+
+  strip2.begin();
+  strip2.show();
+
+  strip3.begin();
+  strip3.show();
+
+  strip4.begin();
+  strip4.show();
+
+  strip5.begin();
+  strip5.show();
+
+  servo.attach(SERVO_PIN, 1000, 2000); //lokiec
+  servo2.attach(SERVO_PIN2, 1000, 2000); //ramie
+
+  pinMode(sensor1, INPUT);
+  pinMode(sensor2, INPUT);
+  pinMode(sensor3, INPUT);
+  pinMode(sensor4, INPUT);
+  pinMode(sensor5, INPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  czeka1(1);
+  czeka2(1);
+  czeka3(1);
+  czeka4(1);
+  czeka5(1);
+
+  for (uint8_t j = 0; j < 5; j++) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[j].setPixelColor(i, leds[j].Color(255, 0, 0));
+    }
+    leds[j].show();
+    delay(50);
+  }
+
+
+  int sumaOdczytow = 0;
+
+  int odczyt1 = analogRead(sensor1);
+  if (odczyt1 < 100) {
+    zapal1(1);
+    odczyt1Aktywny = true;
+    sumaOdczytow++;
+
+  } else {
+    if (odczyt1Aktywny) {
+      zgas1(1);
+      czeka1(1);
+    }
+    odczyt1Aktywny = false;
+  }
+
+  int odczyt2 = analogRead(sensor2);
+  if (odczyt2 < 100) {
+    zapal2(2);
+    odczyt2Aktywny = true;
+    sumaOdczytow++;
+
+  } else {
+    if (odczyt2Aktywny) {
+      zgas2(2);
+      czeka2(2);
+    }
+    odczyt2Aktywny = false;
+  }
+
+  int odczyt3 = analogRead(sensor3);
+  if (odczyt3 < 100) {
+    zapal3(3);
+    odczyt3Aktywny = true;
+    sumaOdczytow++;
+  } else {
+    if (odczyt3Aktywny) {
+      zgas3(3);
+      czeka3(3);
+
+    }
+    odczyt3Aktywny = false;
+
+  }
+
+  int odczyt4 = analogRead(sensor4);
+  if (odczyt4 < 100) {
+    zapal4(4);
+    odczyt4Aktywny = true;
+    sumaOdczytow++;
+
+  } else {
+    if (odczyt4Aktywny) {
+      zgas4(4);
+      czeka4(4);
+
+    }
+    odczyt4Aktywny = false;
+
+  }
+
+  int odczyt5 = analogRead(sensor5);
+  if (odczyt5 < 100) {
+    zapal5(5);
+    odczyt5Aktywny = true;
+    sumaOdczytow++;
+
+  } else {
+    if (odczyt5Aktywny) {
+      zgas5(5);
+      czeka5(5);
+
+    }
+    odczyt5Aktywny = false;
+
+  }
+
+
+
+  if ((sumaOdczytow == 5) && (ktoraDioda1jestAktywna == 8) && (ktoraDioda2jestAktywna == 8) && (ktoraDioda3jestAktywna == 8) && (ktoraDioda4jestAktywna == 8) && (ktoraDioda5jestAktywna == 8)) {
+
+    if (nozJestUruchomiony == false) {
+      nozJestUruchomiony = true;
+      Serial.println("uruchom noz");
+      // ... uruchom sekwencje
+    }
+
+  }
+
+
+  delay(100);
+
+}
+void zapal1(int ktory1Element) {
+
+  if (ktoraDioda1jestAktywna == 8) return;
+  Serial.print("ZAPAL 1");
+  Serial.println(ktory1Element);
+
+  unsigned long currentDioda1Millis = millis();
+  if (currentDioda1Millis - previousDioda1Millis >= interval) {
+    previousDioda1Millis = currentDioda1Millis;
+    leds[ktory1Element - 1].setPixelColor(ktoraDioda1jestAktywna, leds[ktory1Element - 1].Color(30, 30, 0));
+    leds[ktory1Element - 1].show();
+    ktoraDioda1jestAktywna++;
+  }
+
+  if (ktoraDioda1jestAktywna == 8) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory1Element - 1].setPixelColor(i, leds[ktory1Element - 1].Color(0, 30, 0));
+      leds[ktory1Element - 1].show();
+    }
+  }
+
+}
+
+void zgas1(int ktory1Element) {
+  Serial.print("ZGAS 1");
+  Serial.println(ktory1Element);
+
+  if (nozJestUruchomiony) {
+    Serial.println("przerwij dzialanie noza");
+    // ... uruchom sekwencje przerwania dzialania noza
+    nozJestUruchomiony = false;
+    Serial.println("noz wolny");
+  }
+
+  for (uint8_t i = 0; i < ktoraDioda1jestAktywna; i++) {
+    leds[ktory1Element - 1].setPixelColor(i, leds[ktory1Element - 1].Color(30, 30, 0));
+    leds[ktory1Element - 1].show();
+  }
+
+  for (uint8_t i = 0; i < 8; i++) {
+    leds[ktory1Element - 1].setPixelColor(i, leds[ktory1Element - 1].Color(0, 0, 0));
+    leds[ktory1Element - 1].show();
+    delay(50);
+  }
+
+  ktoraDioda1jestAktywna = 0;
+}
+
+void zapal2(int ktory2Element) {
+
+  if (ktoraDioda2jestAktywna == 8) return;
+
+
+  Serial.print("ZAPAL 2");
+  Serial.println(ktory2Element);
+
+  unsigned long currentDioda2Millis = millis();
+  if (currentDioda2Millis - previousDioda2Millis >= interval) {
+    previousDioda2Millis = currentDioda2Millis;
+    leds[ktory2Element - 1].setPixelColor(ktoraDioda2jestAktywna, leds[ktory2Element - 1].Color(30, 30, 0));
+    leds[ktory2Element - 1].show();
+    ktoraDioda2jestAktywna++;
+  }
+
+  if (ktoraDioda2jestAktywna == 8) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory2Element - 1].setPixelColor(i, leds[ktory2Element - 1].Color(0, 60, 0));
+      leds[ktory2Element - 1].show();
+    }
+  }
+
+}
+
+void zgas2(int ktory2Element) {
+  Serial.print("ZGAS 2");
+  Serial.println(ktory2Element);
+
+  if (nozJestUruchomiony) {
+    Serial.println("przerwij dzialanie noza");
+    // ... uruchom sekwencje przerwania dzialania noza
+    nozJestUruchomiony = false;
+    Serial.println("noz wolny");
+  }
+
+  for (uint8_t i = 0; i < ktoraDioda2jestAktywna; i++) {
+    leds[ktory2Element - 1].setPixelColor(i, leds[ktory2Element - 1].Color(30, 30, 0));
+    leds[ktory2Element - 1].show();
+  }
+
+  for (uint8_t i = 0; i < 8; i++) {
+    leds[ktory2Element - 1].setPixelColor(i, leds[ktory2Element - 1].Color(0, 0, 0));
+    leds[ktory2Element - 1].show();
+    delay(50);
+  }
+
+  ktoraDioda2jestAktywna = 0;
+}
+
+void zapal3(int ktory3Element) {
+
+  if (ktoraDioda3jestAktywna == 8) return;
+
+
+  Serial.print("ZAPAL 3");
+  Serial.println(ktory3Element);
+
+  unsigned long currentDioda3Millis = millis();
+  if (currentDioda3Millis - previousDioda3Millis >= interval) {
+    previousDioda3Millis = currentDioda3Millis;
+    leds[ktory3Element - 1].setPixelColor(ktoraDioda3jestAktywna, leds[ktory3Element - 1].Color(30, 30, 0));
+    leds[ktory3Element - 1].show();
+    ktoraDioda3jestAktywna++;
+  }
+
+  if (ktoraDioda3jestAktywna == 8) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory3Element - 1].setPixelColor(i, leds[ktory3Element - 1].Color(0, 60, 0));
+      leds[ktory3Element - 1].show();
+    }
+  }
+
+}
+
+void zgas3(int ktory3Element) {
+  Serial.print("ZGAS 3");
+  Serial.println(ktory3Element);
+
+  if (nozJestUruchomiony) {
+    Serial.println("przerwij dzialanie noza");
+    // ... uruchom sekwencje przerwania dzialania noza
+    nozJestUruchomiony = false;
+    Serial.println("noz wolny");
+  }
+
+  for (uint8_t i = 0; i < ktoraDioda3jestAktywna; i++) {
+    leds[ktory3Element - 1].setPixelColor(i, leds[ktory3Element - 1].Color(30, 30, 0));
+    leds[ktory3Element - 1].show();
+  }
+
+  for (uint8_t i = 0; i < 8; i++) {
+    leds[ktory3Element - 1].setPixelColor(i, leds[ktory3Element - 1].Color(0, 0, 0));
+    leds[ktory3Element - 1].show();
+    delay(50);
+  }
+
+  ktoraDioda3jestAktywna = 0;
+}
+
+void zapal4(int ktory4Element) {
+
+  if (ktoraDioda4jestAktywna == 8) return;
+
+
+  Serial.print("ZAPAL 4");
+  Serial.println(ktory4Element);
+
+  unsigned long currentDioda4Millis = millis();
+  if (currentDioda4Millis - previousDioda4Millis >= interval) {
+    previousDioda4Millis = currentDioda4Millis;
+    leds[ktory4Element - 1].setPixelColor(ktoraDioda4jestAktywna, leds[ktory4Element - 1].Color(30, 30, 0));
+    leds[ktory4Element - 1].show();
+    ktoraDioda4jestAktywna++;
+  }
+
+  if (ktoraDioda4jestAktywna == 8) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory4Element - 1].setPixelColor(i, leds[ktory4Element - 1].Color(0, 30, 0));
+      leds[ktory4Element - 1].show();
+    }
+  }
+
+}
+
+void zgas4(int ktory4Element) {
+  Serial.print("ZGAS 4");
+  Serial.println(ktory4Element);
+
+  if (nozJestUruchomiony) {
+    Serial.println("przerwij dzialanie noza");
+    // ... uruchom sekwencje przerwania dzialania noza
+    nozJestUruchomiony = false;
+    Serial.println("noz wolny");
+  }
+
+  for (uint8_t i = 0; i < ktoraDioda4jestAktywna; i++) {
+    leds[ktory4Element - 1].setPixelColor(i, leds[ktory4Element - 1].Color(30, 30, 0));
+    leds[ktory4Element - 1].show();
+  }
+
+  for (uint8_t i = 0; i < 8; i++) {
+    leds[ktory4Element - 1].setPixelColor(i, leds[ktory4Element - 1].Color(0, 0, 0));
+    leds[ktory4Element - 1].show();
+    delay(50);
+  }
+
+  ktoraDioda4jestAktywna = 0;
+}
+
+void zapal5(int ktory5Element) {
+
+  if (ktoraDioda5jestAktywna == 8) return;
+
+
+  Serial.print("ZAPAL 5");
+  Serial.println(ktory5Element);
+
+  unsigned long currentDioda5Millis = millis();
+  if (currentDioda5Millis - previousDioda5Millis >= interval) {
+    previousDioda5Millis = currentDioda5Millis;
+    leds[ktory5Element - 1].setPixelColor(ktoraDioda5jestAktywna, leds[ktory5Element - 1].Color(30, 30, 0));
+    leds[ktory5Element - 1].show();
+    ktoraDioda5jestAktywna++;
+  }
+
+  if (ktoraDioda5jestAktywna == 8) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory5Element - 1].setPixelColor(i, leds[ktory5Element - 1].Color(0, 60, 0));
+      leds[ktory5Element - 1].show();
+    }
+  }
+
+}
+
+void zgas5(int ktory5Element) {
+  Serial.print("ZGAS 5");
+  Serial.println(ktory5Element);
+
+  if (nozJestUruchomiony) {
+    Serial.println("przerwij dzialanie noza");
+    // ... uruchom sekwencje przerwania dzialania noza
+    nozJestUruchomiony = false;
+    Serial.println("noz wolny");
+  }
+
+  for (uint8_t i = 0; i < ktoraDioda5jestAktywna; i++) {
+    leds[ktory5Element - 1].setPixelColor(i, leds[ktory5Element - 1].Color(30, 30, 0));
+    leds[ktory5Element - 1].show();
+  }
+
+  for (uint8_t i = 0; i < 8; i++) {
+    leds[ktory5Element - 1].setPixelColor(i, leds[ktory5Element - 1].Color(30, 0, 0));
+    leds[ktory5Element - 1].show();
+    delay(50);
+  }
+
+  ktoraDioda5jestAktywna = 0;
+}
+
+void czeka1 (int ktory1Element) {
+  if (ktoraDioda1jestAktywna == 0) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory1Element - 1].setPixelColor(i, leds[ktory1Element - 1].Color(30, 0, 0));
+      leds[ktory1Element - 1].show();
+    }
+  }
+}
+void czeka2(int ktory2Element) {
+  if (ktoraDioda2jestAktywna == 0) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory2Element - 1].setPixelColor(i, leds[ktory2Element - 1].Color(30, 0, 0));
+      leds[ktory2Element - 1].show();
+    }
+  }
+}
+void czeka3 (int ktory3Element) {
+  if (ktoraDioda3jestAktywna == 0) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory3Element - 1].setPixelColor(i, leds[ktory3Element - 1].Color(30, 0, 0));
+      leds[ktory3Element - 1].show();
+    }
+  }
+}
+
+void czeka4 (int ktory4Element) {
+  if (ktoraDioda4jestAktywna == 0) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory4Element - 1].setPixelColor(i, leds[ktory4Element - 1].Color(30, 0, 0));
+      leds[ktory4Element - 1].show();
+    }
+  }
+}
+void czeka5 (int ktory5Element) {
+  if (ktoraDioda5jestAktywna == 0) {
+    for (uint8_t i = 0; i < 8; i++) {
+      leds[ktory5Element - 1].setPixelColor(i, leds[ktory5Element - 1].Color(30, 0, 0));
+      leds[ktory5Element - 1].show();
+    }
+  }
+}
+
+void straszak() {
+  servo.write(random(25, 60)); //lokiec
+  servo2.write(random(60, 110)); //ramie
+  delay(100);
+}
+
+void nozUruchomiony() {
+  p1();
+  p2();
+  p3();
+  p4();
+  p5();
+}
+
+void p1() {
+  for (posramie = 90; posramie <= 155; posramie += v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 155; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p2() {
+  for (posramie = 90; posramie <= 120; posramie += v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg + 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg + 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 120; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p3() {
+  servo2.write(90);
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p4() {
+  for (posramie = 90; posramie >= 60; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 60; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p5() {
+  for (posramie = 90; posramie >= 10; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg - 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg - 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 10; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
