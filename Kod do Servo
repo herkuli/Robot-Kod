@@ -1,0 +1,130 @@
+//1. wyskakuje Błąd: "Błąd kompilacji dla płytki Arduino/Genuino Uno."
+
+
+#include <Servo.h>
+
+int drugieUno;
+
+int posramie = 0;
+int poslokiec = 0;
+float v1 = 3;
+float v2 = 3;
+float pd = 25;
+float pg = 85;
+
+Servo servo;
+Servo servo2;
+
+void setup() {
+  servo.attach(9);
+  servo2.attach(10);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if (drugieUno HIGH) {
+    p1();
+    p2();
+    p3();
+    p4();
+    p5();
+
+  } else {
+    straszak();
+  }
+}
+
+void p1() {
+  for (posramie = 90; posramie <= 155; posramie += v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 155; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p2() {
+  for (posramie = 90; posramie <= 120; posramie += v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg + 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg + 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 120; posramie >= 90; posramie -= v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p3() {
+  servo2.write(90);
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p4() {
+  for (posramie = 90; posramie >= 60; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 60; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+void p5() {
+  for (posramie = 90; posramie >= 10; posramie -= v1) { // goes from 0 degrees to 180 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);
+  }
+
+  for (poslokiec = pd; poslokiec <= pg - 5; poslokiec += v2) { // goes from 180 degrees to 0 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (poslokiec = pg - 5; poslokiec >= pd; poslokiec -= v2) { // goes from 0 degrees to 180 degrees
+    servo.write(poslokiec);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+  for (posramie = 10; posramie <= 90; posramie += v1) { // goes from 180 degrees to 0 degrees
+    servo2.write(posramie);              // tell servo to go to position in variable 'pos'
+    delay(20);                       // waits 15ms for the servo to reach the position
+  }
+}
+
+void straszak() {
+  servo.write(random(25, 60)); //lokiec
+  servo2.write(random(60, 110)); //ramie
+  delay(100);
+}
